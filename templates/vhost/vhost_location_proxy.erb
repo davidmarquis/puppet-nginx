@@ -1,4 +1,7 @@
   location <%= @location %> {
+  <% if @location_include_files %><% @location_include_files.each do |file| -%>
+    include <%= file %>;
+  <% end -%><% end -%>
 <% if @location_cfg_prepend -%><% @location_cfg_prepend.sort_by {|k,v| k}.each do |key,value| -%>
     <%= key %>         <%= value %>;
 <% end -%><% end -%>

@@ -91,6 +91,7 @@ define nginx::resource::vhost (
   $www_root               = undef,
   $rewrite_www_to_non_www = false,
   $rewrite_to_https       = undef,
+  $location_include_files = undef,
   $location_custom_cfg    = undef,
   $location_cfg_prepend   = undef,
   $location_cfg_append    = undef,
@@ -144,23 +145,23 @@ define nginx::resource::vhost (
 
   # Create the default location reference for the vHost
   nginx::resource::location {"${name}-default":
-    ensure               => $ensure,
-    vhost                => $name,
-    ssl                  => $ssl,
-    ssl_only             => $ssl_only,
-    location             => '/',
-    proxy                => $proxy,
-    proxy_read_timeout   => $proxy_read_timeout,
-    proxy_cache          => $proxy_cache,
-    proxy_cache_valid    => $proxy_cache_valid,
-    fastcgi              => $fastcgi,
-    fastcgi_params       => $fastcgi_params,
-    fastcgi_script       => $fastcgi_script,
-    try_files            => $try_files,
-    www_root             => $www_root,
-    index_files          => $index_files,
-    location_custom_cfg  => $location_custom_cfg,
-    notify               => Class['nginx::service'],
+    ensure                  => $ensure,
+    vhost                   => $name,
+    ssl                     => $ssl,
+    ssl_only                => $ssl_only,
+    location                => '/',
+    proxy                   => $proxy,
+    proxy_read_timeout      => $proxy_read_timeout,
+    proxy_cache             => $proxy_cache,
+    proxy_cache_valid       => $proxy_cache_valid,
+    fastcgi                 => $fastcgi,
+    fastcgi_params          => $fastcgi_params,
+    fastcgi_script          => $fastcgi_script,
+    try_files               => $try_files,
+    www_root                => $www_root,
+    index_files             => $index_files,
+    location_custom_cfg     => $location_custom_cfg,
+    notify                  => Class['nginx::service'],
   }
 
   # Support location_cfg_prepend and location_cfg_append on default location created by vhost
@@ -172,6 +173,11 @@ define nginx::resource::vhost (
   if $location_cfg_append {
     Nginx::Resource::Location["${name}-default"] {
       location_cfg_append => $location_cfg_append }
+  }
+
+  if $location_include_files {
+    Nginx::Resource::Location["${name}-default"] {
+      location_include_files => $location_include_files }
   }
 
   if $fastcgi != undef and !defined(File['/etc/nginx/fastcgi_params']) { 
